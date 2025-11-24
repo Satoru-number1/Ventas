@@ -4,9 +4,14 @@ using MicroServicioVentas.Infraestructure.Data;
 using MicroServicioVentas.Core.Interface;
 using MicroServicioVentas.Infraestructure.Repositorio;
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<MicroServicioVentasContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("MicroServicioVentasContext") ?? throw new InvalidOperationException("Connection string 'MicroServicioVentasContext' not found.")));
 
+
+
+//builder.Services.AddDbContext<MicroServicioVentasContext>(options =>
+//    options.UseNpgsql(builder.Configuration.GetConnectionString("MicroServicioVentasContext") ?? throw new InvalidOperationException("Connection string 'MicroServicioVentasContext' not found.")));
+var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
+                       ?? builder.Configuration.GetConnectionString("MicroServicioVentasContext")
+                       ?? throw new InvalidOperationException("Cadena de conexion 'MicroServicioVentas' no encontrado");
 
 
 // Add services to the container.
@@ -44,7 +49,12 @@ using (var scope =app.Services.CreateScope())
     var db=scope.ServiceProvider.GetRequiredService<MicroServicioVentasContext>();
     db.Database.Migrate();
 }
-    app.UseHttpsRedirection();
+
+
+app.UseSwagger();
+app.UseSwaggerUI();
+
+app.UseHttpsRedirection();
 
 app.UseCors("myApp");
 
