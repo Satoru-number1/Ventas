@@ -11,7 +11,7 @@ builder.Services.AddDbContext<MicroServicioVentasContext>(options =>
 
 // Add services to the container.
 
-builder.WebHost.UseUrls("http://0.0.0.8080")
+builder.WebHost.UseUrls("http://0.0.0.8080");
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
@@ -38,14 +38,13 @@ builder.Services.AddCors(option =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
 
-app.UseHttpsRedirection();
+using (var scope =app.Services.CreateScope())
+{
+    var db=scope.ServiceProvider.GetRequiredService<MicroServicioVentasContext>();
+    db.Database.Migrate();
+}
+    app.UseHttpsRedirection();
 
 app.UseCors("myApp");
 
