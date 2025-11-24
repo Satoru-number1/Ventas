@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MicroServicioVentas.Migrations
 {
     /// <inheritdoc />
-    public partial class start : Migration
+    public partial class v0 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -49,7 +49,8 @@ namespace MicroServicioVentas.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Codigo = table.Column<string>(type: "text", nullable: false),
                     NombreProducto = table.Column<string>(type: "text", nullable: false),
-                    Precio = table.Column<decimal>(type: "numeric", nullable: false)
+                    Precio = table.Column<decimal>(type: "numeric", nullable: false),
+                    FechaVencimiento = table.Column<DateOnly>(type: "date", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -66,13 +67,26 @@ namespace MicroServicioVentas.Migrations
                     NombrePromocion = table.Column<string>(type: "text", nullable: false),
                     Descuento = table.Column<decimal>(type: "numeric", nullable: false),
                     Descripcion = table.Column<string>(type: "text", nullable: false),
-                    FechaInicio = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    FechaFin = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    FechaInicio = table.Column<DateOnly>(type: "date", nullable: false),
+                    FechaFin = table.Column<DateOnly>(type: "date", nullable: false),
                     Estado = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Promocion", x => x.IdPromocion);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Semana",
+                columns: table => new
+                {
+                    IdSemana = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    DiaSemana = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Semana", x => x.IdSemana);
                 });
 
             migrationBuilder.CreateTable(
@@ -105,7 +119,10 @@ namespace MicroServicioVentas.Migrations
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     IdPais = table.Column<int>(type: "integer", nullable: false),
                     NombreDireccion = table.Column<string>(type: "text", nullable: false),
-                    IdDependiente = table.Column<int>(type: "integer", nullable: true)
+                    DireccionCompleta = table.Column<string>(type: "text", nullable: false),
+                    IdDependiente = table.Column<int>(type: "integer", nullable: true),
+                    Latitud = table.Column<decimal>(type: "numeric", nullable: false),
+                    Longitud = table.Column<decimal>(type: "numeric", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -119,40 +136,18 @@ namespace MicroServicioVentas.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "VentaBaja",
-                columns: table => new
-                {
-                    IdAlerta = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    IdProducto = table.Column<int>(type: "integer", nullable: false),
-                    ProductoIdProducto = table.Column<int>(type: "integer", nullable: false),
-                    Razon = table.Column<string>(type: "text", nullable: false),
-                    FechaAlerta = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    CampanaCreada = table.Column<bool>(type: "boolean", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_VentaBaja", x => x.IdAlerta);
-                    table.ForeignKey(
-                        name: "FK_VentaBaja_Producto_ProductoIdProducto",
-                        column: x => x.ProductoIdProducto,
-                        principalTable: "Producto",
-                        principalColumn: "IdProducto",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Pedido",
                 columns: table => new
                 {
                     IdPedido = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    CodigoPedido = table.Column<string>(type: "text", nullable: false),
                     IdCliente = table.Column<int>(type: "integer", nullable: false),
                     IdEmpleado = table.Column<int>(type: "integer", nullable: false),
                     IdPromocion = table.Column<int>(type: "integer", nullable: false),
                     IdDireccion = table.Column<int>(type: "integer", nullable: false),
                     Estado = table.Column<string>(type: "text", nullable: false),
-                    FechaCreacion = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    FechaCreacion = table.Column<DateOnly>(type: "date", nullable: false),
                     FechaPedido = table.Column<DateOnly>(type: "date", nullable: false)
                 },
                 constraints: table =>
@@ -179,15 +174,48 @@ namespace MicroServicioVentas.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Visita",
+                columns: table => new
+                {
+                    IdVisita = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    IdEmpleado = table.Column<int>(type: "integer", nullable: false),
+                    IdCliente = table.Column<int>(type: "integer", nullable: false),
+                    IdSemana = table.Column<int>(type: "integer", nullable: false),
+                    IdDireccion = table.Column<int>(type: "integer", nullable: false),
+                    Notas = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Visita", x => x.IdVisita);
+                    table.ForeignKey(
+                        name: "FK_Visita_Cliente_IdCliente",
+                        column: x => x.IdCliente,
+                        principalTable: "Cliente",
+                        principalColumn: "IdCliente",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Visita_Direccion_IdDireccion",
+                        column: x => x.IdDireccion,
+                        principalTable: "Direccion",
+                        principalColumn: "IdDireccion",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Visita_Semana_IdSemana",
+                        column: x => x.IdSemana,
+                        principalTable: "Semana",
+                        principalColumn: "IdSemana",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "DetallePedido",
                 columns: table => new
                 {
                     IdDetallePedido = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     IdPedido = table.Column<int>(type: "integer", nullable: false),
-                    PedidoIdPedido = table.Column<int>(type: "integer", nullable: false),
                     IdProducto = table.Column<int>(type: "integer", nullable: false),
-                    ProductoIdProducto = table.Column<int>(type: "integer", nullable: false),
                     Cantidad = table.Column<int>(type: "integer", nullable: false),
                     PrecioUnitario = table.Column<decimal>(type: "numeric", nullable: false),
                     SubTotal = table.Column<decimal>(type: "numeric", nullable: false),
@@ -198,14 +226,14 @@ namespace MicroServicioVentas.Migrations
                 {
                     table.PrimaryKey("PK_DetallePedido", x => x.IdDetallePedido);
                     table.ForeignKey(
-                        name: "FK_DetallePedido_Pedido_PedidoIdPedido",
-                        column: x => x.PedidoIdPedido,
+                        name: "FK_DetallePedido_Pedido_IdPedido",
+                        column: x => x.IdPedido,
                         principalTable: "Pedido",
                         principalColumn: "IdPedido",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_DetallePedido_Producto_ProductoIdProducto",
-                        column: x => x.ProductoIdProducto,
+                        name: "FK_DetallePedido_Producto_IdProducto",
+                        column: x => x.IdProducto,
                         principalTable: "Producto",
                         principalColumn: "IdProducto",
                         onDelete: ReferentialAction.Cascade);
@@ -218,17 +246,16 @@ namespace MicroServicioVentas.Migrations
                     IdVenta = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     IdPedido = table.Column<int>(type: "integer", nullable: false),
-                    PedidoIdPedido = table.Column<int>(type: "integer", nullable: false),
                     CodigoTransaccion = table.Column<int>(type: "integer", nullable: false),
-                    FechaVenta = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    FechaVenta = table.Column<DateOnly>(type: "date", nullable: false),
                     MontoTotal = table.Column<decimal>(type: "numeric", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Venta", x => x.IdVenta);
                     table.ForeignKey(
-                        name: "FK_Venta_Pedido_PedidoIdPedido",
-                        column: x => x.PedidoIdPedido,
+                        name: "FK_Venta_Pedido_IdPedido",
+                        column: x => x.IdPedido,
                         principalTable: "Pedido",
                         principalColumn: "IdPedido",
                         onDelete: ReferentialAction.Cascade);
@@ -252,19 +279,25 @@ namespace MicroServicioVentas.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_DetallePedido_PedidoIdPedido",
+                name: "IX_DetallePedido_IdPedido",
                 table: "DetallePedido",
-                column: "PedidoIdPedido");
+                column: "IdPedido");
 
             migrationBuilder.CreateIndex(
-                name: "IX_DetallePedido_ProductoIdProducto",
+                name: "IX_DetallePedido_IdProducto",
                 table: "DetallePedido",
-                column: "ProductoIdProducto");
+                column: "IdProducto");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Direccion_IdPais",
                 table: "Direccion",
                 column: "IdPais");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Pedido_CodigoPedido",
+                table: "Pedido",
+                column: "CodigoPedido",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Pedido_IdCliente",
@@ -294,14 +327,24 @@ namespace MicroServicioVentas.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Venta_PedidoIdPedido",
+                name: "IX_Venta_IdPedido",
                 table: "Venta",
-                column: "PedidoIdPedido");
+                column: "IdPedido");
 
             migrationBuilder.CreateIndex(
-                name: "IX_VentaBaja_ProductoIdProducto",
-                table: "VentaBaja",
-                column: "ProductoIdProducto");
+                name: "IX_Visita_IdCliente",
+                table: "Visita",
+                column: "IdCliente");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Visita_IdDireccion",
+                table: "Visita",
+                column: "IdDireccion");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Visita_IdSemana",
+                table: "Visita",
+                column: "IdSemana");
         }
 
         /// <inheritdoc />
@@ -317,13 +360,16 @@ namespace MicroServicioVentas.Migrations
                 name: "Venta");
 
             migrationBuilder.DropTable(
-                name: "VentaBaja");
+                name: "Visita");
+
+            migrationBuilder.DropTable(
+                name: "Producto");
 
             migrationBuilder.DropTable(
                 name: "Pedido");
 
             migrationBuilder.DropTable(
-                name: "Producto");
+                name: "Semana");
 
             migrationBuilder.DropTable(
                 name: "Cliente");

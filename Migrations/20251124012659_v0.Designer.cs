@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace MicroServicioVentas.Migrations
 {
     [DbContext(typeof(MicroServicioVentasContext))]
-    [Migration("20251123204019_part4")]
-    partial class part4
+    [Migration("20251124012659_v0")]
+    partial class v0
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -332,15 +332,12 @@ namespace MicroServicioVentas.Migrations
                     b.Property<decimal>("MontoTotal")
                         .HasColumnType("numeric");
 
-                    b.Property<int>("PedidoIdPedido")
-                        .HasColumnType("integer");
-
                     b.HasKey("IdVenta");
 
                     b.HasIndex("CodigoTransaccion")
                         .IsUnique();
 
-                    b.HasIndex("PedidoIdPedido");
+                    b.HasIndex("IdPedido");
 
                     b.ToTable("Venta");
                 });
@@ -356,6 +353,9 @@ namespace MicroServicioVentas.Migrations
                     b.Property<int>("IdCliente")
                         .HasColumnType("integer");
 
+                    b.Property<int>("IdDireccion")
+                        .HasColumnType("integer");
+
                     b.Property<int>("IdEmpleado")
                         .HasColumnType("integer");
 
@@ -369,6 +369,8 @@ namespace MicroServicioVentas.Migrations
                     b.HasKey("IdVisita");
 
                     b.HasIndex("IdCliente");
+
+                    b.HasIndex("IdDireccion");
 
                     b.HasIndex("IdSemana");
 
@@ -447,7 +449,7 @@ namespace MicroServicioVentas.Migrations
                 {
                     b.HasOne("MicroServicioVentas.Core.Entity.Pedido", "Pedido")
                         .WithMany()
-                        .HasForeignKey("PedidoIdPedido")
+                        .HasForeignKey("IdPedido")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
@@ -462,6 +464,12 @@ namespace MicroServicioVentas.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("MicroServicioVentas.Core.Entity.Direccion", "Direccion")
+                        .WithMany()
+                        .HasForeignKey("IdDireccion")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("MicroServicioVentas.Core.Entity.Semana", "DiaSemana")
                         .WithMany()
                         .HasForeignKey("IdSemana")
@@ -471,6 +479,8 @@ namespace MicroServicioVentas.Migrations
                     b.Navigation("Cliente");
 
                     b.Navigation("DiaSemana");
+
+                    b.Navigation("Direccion");
                 });
 
             modelBuilder.Entity("MicroServicioVentas.Core.Entity.Cliente", b =>
