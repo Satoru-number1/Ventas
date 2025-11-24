@@ -9,9 +9,25 @@ var builder = WebApplication.CreateBuilder(args);
 
 //builder.Services.AddDbContext<MicroServicioVentasContext>(options =>
 //    options.UseNpgsql(builder.Configuration.GetConnectionString("MicroServicioVentasContext") ?? throw new InvalidOperationException("Connection string 'MicroServicioVentasContext' not found.")));
+//var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
+//                       ?? builder.Configuration.GetConnectionString("MicroServicioVentasContext");
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
-                       ?? builder.Configuration.GetConnectionString("MicroServicioVentasContext")
-                       ?? throw new InvalidOperationException("Cadena de conexion 'MicroServicioVentas' no encontrado");
+                         ?? builder.Configuration.GetConnectionString("MicroServicioVentasContext");
+
+// Verificar si la cadena de conexión se encontró.
+if (string.IsNullOrEmpty(connectionString))
+{
+    throw new InvalidOperationException("Connection string 'MicroServicioVentasContext' or 'DATABASE_URL' not found.");
+}
+
+// ?? SOLUCIÓN AL ERROR: REGISTRAR EL DB CONTEXT
+// Asumo que estás usando Npgsql (PostgreSQL) basado en el código comentado.
+builder.Services.AddDbContext<MicroServicioVentasContext>(options =>
+{
+    // Asegúrate de que tienes instalado el paquete Npgsql.EntityFrameworkCore.PostgreSQL
+    options.UseNpgsql(connectionString);
+});
+
 
 
 // Add services to the container.
