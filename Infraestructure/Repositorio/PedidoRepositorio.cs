@@ -152,6 +152,43 @@ namespace MicroServicioVentas.Infraestructure.Repositorio
             
             _context.Pedido.Add(pedido);
             await _context.SaveChangesAsync();
+
+
+            int idDireccionAgrupamiento = idPadre.Value;
+            DateOnly fechaAgrupamiento = fecha;
+            int idPedidoAsignar = pedido.IdPedido;
+
+            // 1. Buscar Visita (Parada) existente para esta Dirección y Fecha
+            var visita = await _context.Visita
+                .Include(v => v.Pedidos) // Necesitamos cargar los PedidosVisita existentes para agregar nuevos
+                .FirstOrDefaultAsync(v =>
+                    v.IdDireccion == idDireccionAgrupamiento &&
+                    v.FechaVisita == fechaAgrupamiento);
+
+            if (visita == null)
+            {
+                // 2. Si no existe, crear una nueva Visita (Parada)
+                visita = new Visita
+                {
+                    IdDireccion = idDireccionAgrupamiento,
+                    FechaVisita = fechaAgrupamiento,
+                    Nota = $"Parada auto-generada para entrega: {envioDireccion}."
+                };
+                _context.Visita.Add(visita);
+            }
+
+            // 3. Asignar el Pedido a la Visita (crear la fila en PedidoVisita)
+            // Agregamos la nueva relación.
+            visita.Pedidos.Add(new PedidoVisita
+            {
+                PedidoId = idPedidoAsignar
+            });
+
+            // 4. Guardar todos los cambios (Visita nueva, o actualización de la Visita + PedidoVisita)
+            await _context.SaveChangesAsync();
+
+
+
             return (pedido.toPedidoDTO());
        
             

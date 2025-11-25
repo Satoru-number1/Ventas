@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace MicroServicioVentas.Core.Entity
 {
-    public class Visita
+    public class Visita 
     {
         [Key]
         public int IdVisita { get; set; }

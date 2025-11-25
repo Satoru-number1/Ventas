@@ -5,21 +5,14 @@
         
         public string Id { get; set; }
     }
-    
-    public class PedidoResumenDto
+    public class VisitaSucursalDOT
     {
-        public int PedidoId { get; set; }
-        public string ClienteNombre { get; set; }
-        public string DescripcionBreve { get; set; }
+        public string CodigoRuta { get; set; }
+        public DateOnly Fecha { get; set; }
+        public ICollection<PedidoDistribuidora> PedidosDistribuidora { get; set; }= new List<PedidoDistribuidora>();
     }
 
-    // DTO para cada ruta/visita en la lista
-    public class RutaResumenDto
-    {
-        public int VisitaId { get; set; }
-        public DateOnly FechaProgramada { get; set; }
-        public string DireccionCompleta { get; set; }
-        public string NotaDeRuta { get; set; }
-        public List<PedidoResumenDto> Pedidos { get; set; }
-    }
+
+
+
 }

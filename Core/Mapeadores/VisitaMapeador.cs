@@ -12,5 +12,22 @@ namespace MicroServicioVentas.Core.Mapeadores
                 
             };
         }
+        public static VisitaSucursalDOT toVisitaSucursalDTO(this Visita visita)
+        {
+            return new VisitaSucursalDOT()
+            {
+                CodigoRuta = visita.Direccion.CodigoDireccion,
+                Fecha = visita.FechaVisita,
+                PedidosDistribuidora = visita.Pedidos
+                    .Select(pv => new PedidoDistribuidora
+                    {
+                        CodigoPedido = pv.Pedido.CodigoPedido,
+                        FechaEntrega = pv.Pedido.FechaPedido,
+                        DireccionEnvio = pv.Pedido.Direccion.DireccionCompleta,
+                    })
+                    .ToList()
+                
+            };
+        }
     }
 }

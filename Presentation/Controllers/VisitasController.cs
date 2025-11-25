@@ -32,31 +32,40 @@ namespace MicroServicioVentas.Presentation.Controllers
         [HttpGet("Rutas")]
         public async Task<IActionResult> GetRuta()
         {
+            // 1. Carga Eager (anticipada) para traer todos los datos necesarios:
+            // Visita -> PedidoVisita -> Pedido -> Dirección
             var visitasConDatos = await _context.Visita
-            .Include(v => v.Direccion) // Incluye la Dirección de la Visita
-            .Include(v => v.Pedidos) // Incluye la tabla de unión
-                .ThenInclude(pv => pv.Pedido) // Incluye el Pedido
-                    .ThenInclude(p => p.Cliente) // Incluye el Cliente del Pedido
-            .ToListAsync();
 
-            // 2. Proyección de la colección de entidades al DTO de salida (RutaResumenDto)
-            var rutasDto = visitasConDatos.Select(visita => new RutaResumenDto
+                // 1. Incluye la colección de la tabla de unión
+                .Include(v => v.Pedidos)
+
+                    // 2. Desde la unión, incluye la entidad Pedido
+                    .ThenInclude(pv => pv.Pedido)
+
+                        // 3. Desde el Pedido, incluye la entidad Dirección
+                        // ¡Esto es crucial para obtener la DireccionCompleta del pedido!
+                        .ThenInclude(p => p.Direccion)
+                .ToListAsync();
+
+            // 2. Proyección de la colección de entidades a la estructura de DTOs
+            var rutasDto = visitasConDatos.Select(visita => new VisitaSucursalDOT
             {
-                VisitaId = visita.IdVisita,
-                FechaProgramada = visita.FechaVisita,
+                // Asignación de propiedades de la Visita (Ruta)
+                CodigoRuta = visita.Direccion.CodigoDireccion, // Ejemplo, usando el ID como código
+                Fecha =visita.FechaVisita, // Asumimos DateOnly en la entidad Visita
 
-                // Adaptar campos de la dirección
-                DireccionCompleta =visita.Direccion.DireccionCompleta,
-                NotaDeRuta = visita.Nota,
-
-                // Mapea la lista de la tabla de unión al DTO de resumen
-                Pedidos = visita.Pedidos
-                    .Select(pv => new PedidoResumenDto
+                // Mapeo de la lista de la tabla de unión al DTO PedidoDistribuidora
+                PedidosDistribuidora = visita.Pedidos
+                    .Select(pv => new PedidoDistribuidora
                     {
-                        PedidoId = pv.PedidoId,
-                        // Asegúrate de que las entidades Pedido y Cliente tengan estas propiedades
-                        ClienteNombre = pv.Pedido.Cliente.Nombre,
-                        
+                        // Asignación de propiedades del Pedido
+                        CodigoPedido = pv.Pedido.CodigoPedido,
+                        Estado = pv.Pedido.Estado,
+
+                        // ⭐ Aquí tomamos la DireccionCompleta del Pedido.Direccion
+                        DireccionEnvio = pv.Pedido.Direccion.DireccionCompleta,
+
+                        FechaEntrega = pv.Pedido.FechaPedido
                     })
                     .ToList()
             }).ToList();
@@ -68,6 +77,45 @@ namespace MicroServicioVentas.Presentation.Controllers
 
             return Ok(rutasDto);
         }
+
+
+        [HttpGet("Ruta/Codigo/{codigoDireccion}")]
+        public async Task<IActionResult> GetRuta([FromRoute]string codigoDireccion)
+        {
+            var direccionFiltro = await _context.Direccion
+            .FirstOrDefaultAsync(d => d.CodigoDireccion == codigoDireccion);
+
+            if (direccionFiltro == null)
+            {
+                return NotFound($"No se encontró una Dirección con el código '{codigoDireccion}'.");
+            }
+
+            // 2. Cargar Visitas (Paradas) asociadas a esa IdDireccion
+            var visitasConDatos = await _context.Visita
+                // Filtramos solo las visitas que usan la IdDireccion encontrada
+                .Where(v => v.IdDireccion == direccionFiltro.IdDireccion)
+
+                // 3. Carga Eager (anticipada) para traer todos los datos de los pedidos
+                .Include(v => v.Direccion) // Incluimos la dirección de la visita (que es la dirección de entrega)
+                .Include(v => v.Pedidos)
+                    .ThenInclude(pv => pv.Pedido)
+                        .ThenInclude(p => p.Direccion) // Incluimos la dirección del pedido (por si acaso, aunque ya debería ser la misma)
+                .ToListAsync();
+
+            // 4. Proyección a DTOs (Usando tu método de extensión)
+            var rutasDto = visitasConDatos
+                .Select(v => v.toVisitaSucursalDTO())
+                .ToList();
+
+            if (!rutasDto.Any())
+            {
+                return NotFound($"No se encontraron rutas programadas para el código: '{codigoDireccion}'.");
+            }
+
+            return Ok(rutasDto);
+         
+        }
+
         /*
         // GET: api/Visitas/5
         [HttpGet("{id}")]
@@ -116,7 +164,7 @@ namespace MicroServicioVentas.Presentation.Controllers
 
         // POST: api/Visitas
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPost]
+        /*[HttpPost]
         public async Task<IActionResult> PostVisita(int idEmpleado,string cliente,string ciCliente,string dia,string direccion, decimal latitud, decimal lontigud)
         {
 
@@ -130,7 +178,7 @@ namespace MicroServicioVentas.Presentation.Controllers
             
             await  _context.SaveChangesAsync();
             return Ok();
-        }
+        }*/
         /*
         // DELETE: api/Visitas/5
         [HttpDelete("{id}")]
@@ -148,6 +196,6 @@ namespace MicroServicioVentas.Presentation.Controllers
             return NoContent();
         }
         */
-  
+
     }
 }
