@@ -7,6 +7,7 @@ namespace MicroServicioVentas.Core.Entity
     {
         [Key]
         public int IdDireccion { get; set; }
+        public string CodigoDireccion { get; set; }
         public int IdPais {get;set;}
         //para acceder a las propiedades de la clase Pais
         [ForeignKey("IdPais")]

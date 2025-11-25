@@ -11,4 +11,10 @@
         public decimal Longitud { get; set; }
 
     }
+    public class VisitaDistribuidora 
+    {
+        public string CodigoRuta { get; set; }
+
+    }
+
 }

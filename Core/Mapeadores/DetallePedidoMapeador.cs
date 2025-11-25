@@ -18,5 +18,15 @@ namespace MicroServicioVentas.Core.Mapeadores
                 Subtotal = detallePedido.SubTotal
             };
         }
+        public static DetallesPedidoDistribuidora toDetallePedidoToDetallesPedidoDistribuidora(this DetallePedido detallePedido)
+        {
+            return new DetallesPedidoDistribuidora()
+            {
+                CodigoProducto = detallePedido.Producto.Codigo,
+                Cantidad = detallePedido.Cantidad,
+                PrecioUnitario = detallePedido.Producto.Precio,
+                Subtotal = detallePedido.SubTotal
+            };
+        }
     }
 }

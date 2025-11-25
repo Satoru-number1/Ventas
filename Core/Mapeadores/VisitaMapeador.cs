@@ -9,13 +9,7 @@ namespace MicroServicioVentas.Core.Mapeadores
         public static VisitaDTO toVisitaDTO(this Visita visita)
         {
             return new VisitaDTO() {
-                IdEmpleado = visita.IdEmpleado,
-                Ci = visita.Cliente.Ci,
-                NombreCliente = visita.Cliente.Nombre,
-                DiaSemana = visita.DiaSemana.DiaSemana,
-                DireccionCompleta = visita.Direccion.DireccionCompleta,
-                Latitud = visita.Direccion.Latitud,
-                Longitud = visita.Direccion.Longitud
+                
             };
         }
     }

@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+ï»¿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using MicroServicioVentas.Infraestructure.Data;
 using MicroServicioVentas.Core.Interface;
@@ -12,21 +12,22 @@ var builder = WebApplication.CreateBuilder(args);
 //var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
 //                       ?? builder.Configuration.GetConnectionString("MicroServicioVentasContext");
 var connectionString = Environment.GetEnvironmentVariable("DATABASE_URL")
-                         ?? builder.Configuration.GetConnectionString("MicroServicioVentasContext");
+                          ?? builder.Configuration.GetConnectionString("MicroServicioVentasContext");
 
-// Verificar si la cadena de conexión se encontró.
+// Verificar si la cadena de conexiÃ³n se encontrÃ³.
 if (string.IsNullOrEmpty(connectionString))
 {
     throw new InvalidOperationException("Connection string 'MicroServicioVentasContext' or 'DATABASE_URL' not found.");
 }
 
-// ?? SOLUCIÓN AL ERROR: REGISTRAR EL DB CONTEXT
-// Asumo que estás usando Npgsql (PostgreSQL) basado en el código comentado.
+// ðŸŽ¯ SOLUCIÃ“N AL ERROR: REGISTRAR EL DB CONTEXT
+// Asumo que estÃ¡s usando Npgsql (PostgreSQL) basado en el cÃ³digo comentado.
 builder.Services.AddDbContext<MicroServicioVentasContext>(options =>
 {
-    // Asegúrate de que tienes instalado el paquete Npgsql.EntityFrameworkCore.PostgreSQL
+    // AsegÃºrate de que tienes instalado el paquete Npgsql.EntityFrameworkCore.PostgreSQL
     options.UseNpgsql(connectionString);
 });
+
 
 
 
@@ -71,7 +72,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
-
+ 
 app.UseCors("myApp");
 
 app.UseAuthorization();

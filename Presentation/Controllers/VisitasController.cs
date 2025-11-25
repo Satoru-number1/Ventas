@@ -26,12 +26,12 @@ namespace MicroServicioVentas.Presentation.Controllers
         [HttpGet]
         public async Task<IActionResult> GetVisita()
         {
-            return Ok(await (from v in _context.Visita
-                             select v)
-                             .Include(c=>c.Cliente).
-                             Include(d=>d.Direccion).
-                             Include(s=>s.DiaSemana).Select(v=>v.toVisitaDTO())
-                             .ToListAsync());
+            return Ok();
+        }
+        [HttpGet("Rutas")]
+        public async Task<IActionResult> GetRuta()
+        {
+            return Ok();
         }
         /*
         // GET: api/Visitas/5
@@ -91,14 +91,8 @@ namespace MicroServicioVentas.Presentation.Controllers
             string lastDirection = direccionSpliteada[^1].Trim();
             var direccionExistente = await _context.Direccion.FirstOrDefaultAsync(d => d.NombreDireccion == lastDirection)
             ;
-            Visita visita= new Visita() {
-                IdEmpleado = idEmpleado,
-                IdCliente = clienteExistente.IdCliente,
-                IdSemana = diaSemana.IdSemana,
-                IdDireccion = direccionExistente.IdDireccion,
-                Notas = $"Visia para verificar si le hace falta algo"
-            };
-            _context.Visita.Add(visita);
+            
+            
             await  _context.SaveChangesAsync();
             return Ok();
         }
@@ -119,9 +113,6 @@ namespace MicroServicioVentas.Presentation.Controllers
             return NoContent();
         }
         */
-        private bool VisitaExists(int id)
-        {
-            return _context.Visita.Any(e => e.IdVisita == id);
-        }
+  
     }
 }

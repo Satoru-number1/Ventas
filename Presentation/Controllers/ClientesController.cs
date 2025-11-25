@@ -25,6 +25,7 @@ namespace MicroServicioVentas.Presentation.Controllers
         }
 
         [HttpGet]
+
         public async Task<IActionResult> GetCliente()
         {
             var cliente = await _context.GetCLiente();

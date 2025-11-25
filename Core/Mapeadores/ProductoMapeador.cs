@@ -12,7 +12,7 @@ namespace MicroServicioVentas.Core.Mapeadores
                 Codigo = producto.Codigo,
                 Nombre = producto.NombreProducto,
                 Precio = producto.Precio,
-                FechaVencimiento = producto.FechaVencimiento
+                
             };
         }
     }

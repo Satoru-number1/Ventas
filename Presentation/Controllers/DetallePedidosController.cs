@@ -27,10 +27,10 @@ namespace MicroServicioVentas.Presentation.Controllers
         public async Task<IActionResult> GetDetallePedido()
         {
             return Ok(await _context.DetallePedido.Include(dp=>dp.Producto)
-                          .Select(dp=>dp.toDetallePedidoDTO())
+                          .Select(dp=>dp.toDetallePedidoToDetallesPedidoDistribuidora())
                           .ToListAsync());
         }
-
+        /*
         // GET: api/DetallePedidos/5
         [HttpGet("{id}")]
         public async Task<ActionResult<DetallePedido>> GetDetallePedido(int id)
@@ -43,7 +43,7 @@ namespace MicroServicioVentas.Presentation.Controllers
             }
 
             return detallePedido;
-        }
+        }*/
         /*
         // PUT: api/DetallePedidos/5
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

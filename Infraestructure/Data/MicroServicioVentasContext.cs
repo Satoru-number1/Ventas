@@ -25,5 +25,6 @@ namespace MicroServicioVentas.Infraestructure.Data
         public DbSet<MicroServicioVentas.Core.Entity.DetallePedido> DetallePedido { get; set; } = default!;
         public DbSet<MicroServicioVentas.Core.Entity.Visita> Visita { get; set; } = default!;
         public DbSet<MicroServicioVentas.Core.Entity.Semana> Semana { get; set; } = default!;
+        public DbSet<MicroServicioVentas.Core.Entity.PedidoVisita> PedidoVisita { get; set; } = default!;
     }
 }

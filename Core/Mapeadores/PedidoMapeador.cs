@@ -18,5 +18,16 @@ namespace MicroServicioVentas.Core.Mapeadores
                 Pedidos = pedido.DetallesPedido.Select(dt=>dt.toDetallePedidoDTO()).ToList()
             };
         }
+        public static PedidoDistribuidora toPedidoToPedidoDistribuidora(this Pedido pedido)
+        {
+            return new PedidoDistribuidora()
+            {
+                CodigoPedido = pedido.CodigoPedido,
+                
+                DireccionEnvio = pedido.Direccion.DireccionCompleta,
+                FechaEntrega = pedido.FechaPedido,
+                Estado = pedido.Estado
+            };
+        }
     }
 }

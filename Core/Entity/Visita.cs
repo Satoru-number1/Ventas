@@ -7,17 +7,13 @@ namespace MicroServicioVentas.Core.Entity
     {
         [Key]
         public int IdVisita { get; set; }
-        public int IdEmpleado { get; set; }
-        public int IdCliente { get; set; }
-        [ForeignKey(nameof(IdCliente))]
-        public Cliente Cliente { get; set; }
-        public int IdSemana { get; set; }
-        [ForeignKey(nameof(IdSemana))]  
-        public Semana DiaSemana {get;set;}
 
         public int IdDireccion { get; set; }
         [ForeignKey(nameof(IdDireccion))]
         public Direccion Direccion { get; set; }
-        public string Notas { get; set; }
+        public string Nota { get; set; } = "Entrega de pedido";
+        public ICollection<PedidoVisita> Pedidos { get; set; }= new List<PedidoVisita>();
+
+
     }
 }

@@ -31,4 +31,19 @@ namespace MicroServicioVentas.Core.DTO
         public decimal Total { get; set; }
 
     }
+    public class PedidoDistribuidora
+    {
+        public string CodigoPedido { get; set; }
+        
+        public string Estado { get; set; }
+        public string DireccionEnvio { get; set; }
+        public DateOnly FechaEntrega { get; set; }
+    }
+    public class DetallesPedidoDistribuidora
+    {
+        public string CodigoProducto { get; set; }     
+        public int Cantidad { get; set; }
+        public decimal PrecioUnitario { get; set; }
+        public decimal Subtotal { get; set; }
+    }
 }

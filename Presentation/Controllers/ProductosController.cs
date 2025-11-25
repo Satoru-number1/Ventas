@@ -85,7 +85,7 @@ namespace MicroServicioVentas.Presentation.Controllers
                 Codigo=codigo,
                 NombreProducto=nombre,
                 Precio=precioUnitario,
-                FechaVencimiento=DateOnly.ParseExact(fechaVencimiento,"dd/MM/yyyy",CultureInfo.InvariantCulture)
+               
             };
 
             _context.Producto.Add(producto);

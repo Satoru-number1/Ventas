@@ -10,6 +10,7 @@ namespace MicroServicioVentas.Core.Mapeadores
         {
             return new DireccionDTO()
             {
+                CodigoDireccion = direccion.CodigoDireccion,
                 DireccionCompleta = direccion.NombreDireccion,
                 IdDependiente = direccion.IdDependiente 
             };

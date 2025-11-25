@@ -18,7 +18,7 @@ namespace MicroServicioVentas.Infraestructure.Repositorio
             _context = context;
         }
 
-        public async Task<List<PedidoDTO>> GetPedidos()
+        public async Task<List<PedidoDistribuidora>> GetPedidos()
         {
             var pedido = await (from p in _context.Pedido
                                where p.Estado=="Proceso" select p).
@@ -33,7 +33,67 @@ namespace MicroServicioVentas.Infraestructure.Repositorio
                 .ToListAsync();
 
 
-            var pedidoDTO = pedido.Select(p=>p.toPedidoDTO()).ToList();
+            var pedidoDTO = pedido.Select(p=>p.toPedidoToPedidoDistribuidora()).ToList();
+            return pedidoDTO;
+        }
+
+        public async Task<List<PedidoDTO>> GetPedidosAll()
+        {
+            var pedido = await(from p in _context.Pedido
+                               
+                               select p).
+                               //aqui incluye la coleccion de los detalles
+                               Include(p => p.DetallesPedido).
+                               //y aqui se incluye la propiedad del objeto producto dentro de cada detalle
+                               ThenInclude(d => d.Producto).
+                               Include(p => p.Promocion).
+                               Include(p => p.Cliente).
+                               Include(d => d.Direccion)
+
+                .ToListAsync();
+
+
+            var pedidoDTO = pedido.Select(p => p.toPedidoDTO()).ToList();
+            return pedidoDTO;
+        }
+
+        public async Task<List<PedidoDistribuidora>> GetPedidosCancelados()
+        {
+            var pedido = await (from p in _context.Pedido
+                                where p.Estado == "Cancelado"
+                                select p).
+                               //aqui incluye la coleccion de los detalles
+                               Include(p => p.DetallesPedido).
+                               //y aqui se incluye la propiedad del objeto producto dentro de cada detalle
+                               ThenInclude(d => d.Producto).
+                               Include(p => p.Promocion).
+                               Include(p => p.Cliente).
+                               Include(d => d.Direccion)
+
+                .ToListAsync();
+
+
+            var pedidoDTO = pedido.Select(p => p.toPedidoToPedidoDistribuidora()).ToList();
+            return pedidoDTO;
+        }
+
+        public async Task<List<PedidoDistribuidora>> GetPedidosEntregados()
+        {
+            var pedido = await (from p in _context.Pedido
+                                where p.Estado == "Entregado"
+                                select p).
+                               //aqui incluye la coleccion de los detalles
+                               Include(p => p.DetallesPedido).
+                               //y aqui se incluye la propiedad del objeto producto dentro de cada detalle
+                               ThenInclude(d => d.Producto).
+                               Include(p => p.Promocion).
+                               Include(p => p.Cliente).
+                               Include(d => d.Direccion)
+
+                .ToListAsync();
+
+
+            var pedidoDTO = pedido.Select(p => p.toPedidoToPedidoDistribuidora()).ToList();
             return pedidoDTO;
         }
 
@@ -89,43 +149,11 @@ namespace MicroServicioVentas.Infraestructure.Repositorio
                     IdDireccion = idPadre.Value,
                     FechaPedido = fecha
                 };
-            //revisar si existe alguna promocion
-            //decimal existPromo = (promocion!=null)?promocion.Descuento:1;
-            //    decimal totalPedido = 0;
-            //string[] listaProductos= productos.Split(',');
-            //    for (int i = 0; i < listaProductos.Length; i++)
-            //    {
-            //        string producto = listaProductos[i].ToLower().Trim();
-            //        var detallepedido = await (from p in _context.Producto
-            //                                   where p.NombreProducto == producto
-            //                                   select p).FirstOrDefaultAsync();
-            //        DetallePedido detalle = new DetallePedido()
-            //        {
-            //            IdProducto = detallepedido.IdProducto,
-            //            Cantidad = cantidad,
-            //            IdPedido =pedido.IdPedido,
-            //            Descuento= existPromo,
-            //            SubTotal=(detallepedido.Precio * cantidad)*existPromo,
-                        
-            //        };
-            //        totalPedido += detalle.SubTotal;
-            //        if (i==listaProductos.Length-1)
-            //        {
-            //            detalle.Total=totalPedido;
-            //        }
-                    
-            //    }
+            
             _context.Pedido.Add(pedido);
             await _context.SaveChangesAsync();
             return (pedido.toPedidoDTO());
-            //    await transaction.CommitAsync();
-            //    return pedido;
-            //}
-            //catch (Exception ex)
-            //{
-            //    await transaction.RollbackAsync();
-                
-            //    return new Pedido();}
+       
             
         }
 
@@ -138,6 +166,16 @@ namespace MicroServicioVentas.Infraestructure.Repositorio
             _context.SaveChangesAsync();
 
             return (IActionResult) pedido.toPedidoDTO();
+        }
+
+        public async Task<IActionResult> PutPedidoEntregado( string codigoPedido)
+        {
+            var pedido= await (from p in _context.Pedido
+                                where p.CodigoPedido == codigoPedido
+                                select p).FirstOrDefaultAsync();
+            pedido.Estado = "Entregado";
+            _context.SaveChangesAsync();
+            return (IActionResult)pedido.toPedidoToPedidoDistribuidora(); 
         }
     }
 }

@@ -24,60 +24,44 @@ namespace MicroServicioVentas.Presentation.Controllers
         {
             _context = context;
         }
-
-        // GET: api/Pedidos
+        //todos los pedidos
         [HttpGet]
-        public async Task<IActionResult> GetPedido()
+        public async Task<IActionResult> GetPedidoAll()
         {
-            var ped= await _context.GetPedidos();
+            var ped = await _context.GetPedidosAll();
             return Ok(ped);
         }
-
-        /*// GET: api/Pedidos/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Pedido>> GetPedido(int id)
+        // GET: api/Pedidos
+        //solo los pedidos en proceso
+        [HttpGet("PedidosEnProceso")]
+        public async Task<IActionResult> GetPedido()
         {
-            var pedido = await _context.Pedido.FindAsync(id);
-
-            if (pedido == null)
-            {
-                return NotFound();
-            }
-
-            return pedido;
+            var ped = await _context.GetPedidos();
+            return Ok(ped);
         }
-
-        // PUT: api/Pedidos/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutPedido(int id, Pedido pedido)
+        //pedidos entregados 
+        [HttpGet("PedidosEntregados")]
+        public async Task<IActionResult> GetPedidoEntregado()
         {
-            if (id != pedido.IdPedido)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(pedido).State = EntityState.Modified;
-
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!PedidoExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-
-            return NoContent();
+            var ped = await _context.GetPedidosEntregados();
+            return Ok(ped);
         }
-        */
+        //pedidos cancelados
+        [HttpGet("PedidosCancelados")]
+        public async Task<IActionResult> GetPedidoCancelados()
+        {
+            var ped = await _context.GetPedidosCancelados();
+            return Ok(ped);
+        }
+        [HttpGet("{CodigoDireccion}")]
+        public async Task<IActionResult> GetPedidoSegunRuta()
+        {
+            var ped = await _context.GetPedidosCancelados();
+            return Ok(ped);
+        }
+       
+
+
         // POST: api/Pedidos
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
@@ -93,7 +77,12 @@ namespace MicroServicioVentas.Presentation.Controllers
             var pedido = _context.PutPedido(nuevoEstado,codigoPedido);
             return Ok(await pedido);
         }
-
+        [HttpPut("PedidoEntregado/{codigoPedido}")]
+        public async Task<IActionResult> PutPedidoEntregado([FromRoute]string codigoPedido)
+        {
+            var pedido = _context.PutPedidoEntregado(codigoPedido);
+            return Ok(await pedido);
+        }
         /* // DELETE: api/Pedidos/5
          [HttpDelete("{id}")]
          public async Task<IActionResult> DeletePedido(int id)
