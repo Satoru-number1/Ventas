@@ -25,7 +25,7 @@ namespace MicroServicioVentas.Infraestructure.Repositorio
             return  direcciones.Select(d=>d.toDireccionDTO()).ToList();
         }
 
-        public async Task<IActionResult> PostDireccion(string direccion,decimal latitud,decimal longitud)
+        public async Task<IActionResult> PostDireccion(string direccion,string codigoDirec,decimal latitud,decimal longitud)
         {
             var paisBolivia = await _context.Pais
                 .FirstOrDefaultAsync(p => p.NombrePais.ToLower() == "bolivia");
@@ -60,6 +60,7 @@ namespace MicroServicioVentas.Infraestructure.Repositorio
                     {
                         IdPais = idPais, 
                         NombreDireccion = nombreActual,
+                        CodigoDireccion= codigoDirec,
                         IdDependiente = idPadreActual,
                         DireccionCompleta = direccion,
                         Latitud = latitud,
