@@ -12,6 +12,7 @@ namespace MicroServicioVentas.Core.Entity
         [ForeignKey(nameof(IdDireccion))]
         public Direccion Direccion { get; set; }
         public string Nota { get; set; } = "Entrega de pedido";
+        public DateOnly FechaVisita { get; set; }
         public ICollection<PedidoVisita> Pedidos { get; set; }= new List<PedidoVisita>();
 
 
