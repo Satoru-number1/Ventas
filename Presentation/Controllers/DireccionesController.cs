@@ -39,7 +39,7 @@ namespace MicroServicioVentas.Presentation.Controllers
         // POST: api/Direcciones
         // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
-        public async Task<IActionResult> PostDireccion(string direccion, decimal latitud, decimal longitud)
+        public async Task<IActionResult> PostDireccion(string direccion,string codigoDireccion, decimal latitud, decimal longitud)
         {
             /*string[] subdivisiones=direccion.Split('/');
             for (int i=0;i<subdivisiones.Length;i++)
@@ -65,7 +65,7 @@ namespace MicroServicioVentas.Presentation.Controllers
 
 
             
-            return Ok(await _context.PostDireccion(direccion,latitud,longitud ));
+            return Ok(await _context.PostDireccion(direccion,codigoDireccion,latitud,longitud ));
         }
 /*
         // DELETE: api/Direcciones/5
