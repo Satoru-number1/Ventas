@@ -1,13 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using MicroServicioVentas.Core.DTO;
+using MicroServicioVentas.Core.Entity;
+using MicroServicioVentas.Core.Mapeadores;
+using MicroServicioVentas.Infraestructure.Data;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using MicroServicioVentas.Core.Entity;
-using MicroServicioVentas.Infraestructure.Data;
-using MicroServicioVentas.Core.Mapeadores;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace MicroServicioVentas.Presentation.Controllers
 {
@@ -31,7 +32,41 @@ namespace MicroServicioVentas.Presentation.Controllers
         [HttpGet("Rutas")]
         public async Task<IActionResult> GetRuta()
         {
-            return Ok();
+            var visitasConDatos = await _context.Visita
+            .Include(v => v.Direccion) // Incluye la Dirección de la Visita
+            .Include(v => v.Pedidos) // Incluye la tabla de unión
+                .ThenInclude(pv => pv.Pedido) // Incluye el Pedido
+                    .ThenInclude(p => p.Cliente) // Incluye el Cliente del Pedido
+            .ToListAsync();
+
+            // 2. Proyección de la colección de entidades al DTO de salida (RutaResumenDto)
+            var rutasDto = visitasConDatos.Select(visita => new RutaResumenDto
+            {
+                VisitaId = visita.IdVisita,
+                FechaProgramada = visita.FechaVisita,
+
+                // Adaptar campos de la dirección
+                DireccionCompleta =visita.Direccion.DireccionCompleta,
+                NotaDeRuta = visita.Nota,
+
+                // Mapea la lista de la tabla de unión al DTO de resumen
+                Pedidos = visita.Pedidos
+                    .Select(pv => new PedidoResumenDto
+                    {
+                        PedidoId = pv.PedidoId,
+                        // Asegúrate de que las entidades Pedido y Cliente tengan estas propiedades
+                        ClienteNombre = pv.Pedido.Cliente.Nombre,
+                        
+                    })
+                    .ToList()
+            }).ToList();
+
+            if (rutasDto == null || !rutasDto.Any())
+            {
+                return NotFound("No se encontraron rutas programadas.");
+            }
+
+            return Ok(rutasDto);
         }
         /*
         // GET: api/Visitas/5
