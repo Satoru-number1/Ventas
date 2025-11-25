@@ -2,19 +2,24 @@
 {
     public class VisitaDTO
     {
-        public int IdEmpleado { get; set; }
-        public string Ci { get; set; }
-        public string NombreCliente { get; set; }
-        public string DiaSemana { get; set; }
-        public string DireccionCompleta { get; set; }
-        public decimal Latitud { get; set; }
-        public decimal Longitud { get; set; }
-
+        
+        public string Id { get; set; }
     }
-    public class VisitaDistribuidora 
+    
+    public class PedidoResumenDto
     {
-        public string CodigoRuta { get; set; }
-
+        public int PedidoId { get; set; }
+        public string ClienteNombre { get; set; }
+        public string DescripcionBreve { get; set; }
     }
 
+    // DTO para cada ruta/visita en la lista
+    public class RutaResumenDto
+    {
+        public int VisitaId { get; set; }
+        public DateOnly FechaProgramada { get; set; }
+        public string DireccionCompleta { get; set; }
+        public string NotaDeRuta { get; set; }
+        public List<PedidoResumenDto> Pedidos { get; set; }
+    }
 }
