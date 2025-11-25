@@ -7,6 +7,6 @@ namespace MicroServicioVentas.Core.Interface
     public interface IDireccionRepositorio
     {
         Task<List<DireccionDTO>> GetDireccion();
-        Task<IActionResult> PostDireccion(string direccion,decimal latitud,decimal longitud);
+        Task<IActionResult> PostDireccion(string direccion,string codigoD,decimal latitud,decimal longitud);
     }
 }
